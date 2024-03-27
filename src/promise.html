@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<script>
+    const task = () => {
+        return new Promise(resolve => {
+            console.log('3');
+            resolve('4')
+            setTimeout(() => {
+                
+                resolve('2');
+                console.log('1');
+            }, 1000);
+        });
+    };
+
+    async function test() {
+        console.log(0);
+        const res = await task();
+        console.log(res);
+    }
+
+    console.log('111111');
+    test();
+    console.log('222222');
+
+    // 111 0 3 2222 4 1
+
+    const arr=[
+        {age:19,name:'123'},
+        {age:29,name:'1243'},
+    ]
+    var s=arr.indexOf({age:19,name:'123'})
+    console.log(s)
+
+
+    function foo() {
+  console.log(this); // obj对象
+}
+
+var obj1 = {
+  name: "obj1",
+  foo: foo
+}
+
+var obj2 = {
+  name: "obj2",
+  obj1: obj1
+}
+
+obj2.obj1.foo();
+
+</script>
+</body>
+</html>
