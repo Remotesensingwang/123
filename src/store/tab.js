@@ -4,7 +4,7 @@ export default {
         isCollapse:false, //控制菜单是展开还是收起
         tabsList:[        //面包屑数据 默认数据
             {
-                path:'/home',
+                path:'/',
                 name:'home',
                 label:'首页',
                 icon:'s-home',

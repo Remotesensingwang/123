@@ -5,7 +5,7 @@
               <!-- 面包屑 -->
               <!-- <span class="text">首页</span> -->
               <el-breadcrumb separator="/">
-                <el-breadcrumb-item v-for="item in tags" :to="{path:item.path}" :key="item.path" >{{item.label}}</el-breadcrumb-item>
+                <el-breadcrumb-item v-for="item in tags" :to="topath(item)" :key="item.path" >{{item.label}}</el-breadcrumb-item>
               </el-breadcrumb>
         </div>
         <div class="r-content">
@@ -42,6 +42,11 @@
                 this.collapsemenu()
                 // this.$bus.$emit('isCollapseevent', this.isCollapse)
             },
+            topath(item){
+                if (this.$route.path !== item.path && !(this.$route.path ==='/home' && item.path ==='/')){
+                    return {path:item.path}
+                }
+            },
             handleCommand(command){
                 console.log(command);
                 if (command === 'logout') {
@@ -71,12 +76,13 @@
                         &.is-link{
                             color: #666;
                             font-weight: 400;
+                            // cursor: pointer;
                         } 
                     }
                     &:last-child{
                         .el-breadcrumb__inner{
                             color: #fff;
-                            cursor: pointer;
+                            
                         }
                 } 
                 }

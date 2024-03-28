@@ -12,6 +12,7 @@
                 label-width="80px" 
                 :rules="rules"
                 stripe
+                label-position='left'
                 ref="form">
                 <el-form-item label="姓名" prop="name">
                     <el-input  placeholder="请输入姓名" v-model="form.name"></el-input>
@@ -53,7 +54,7 @@
                     <el-input v-model="userForm.name" placeholder="请输入名称"></el-input>
                     <el-button @click="handleSearch" >搜索</el-button>
                 </el-form-item>
-            </el-form>          -->
+            </el-form> -->
             <div>
                     <el-input v-model="userForm.name" placeholder="请输入名称"></el-input>
                     <el-button @click="handleSearch" >搜索</el-button>
@@ -156,7 +157,8 @@
                 },
                 modelType:0, //0表示的是新增用户 1表示更新用户
                 total:0,//当前的总条数 默认为0
-                pageData:{
+                
+                pageData:{ //给后端传递的参数
                     page:1,
                     limit:10
                 },
@@ -166,9 +168,6 @@
             }
         },
         computed: {
-            // td(){
-            //     return this.tableData.filter(item => item.name.indexOf(this.names) !== -1)
-            // }
         },
         methods: {
             // 新增按钮
@@ -292,6 +291,12 @@
 <style lang="less" scoped>
     .manage{
         height: 90%;
+        .el-select{
+            width: 202px;
+        }
+        .el-date-editor{
+            width: 202px;
+        }
         .manage-header{
             display: flex;
             justify-content: space-between;

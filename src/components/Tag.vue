@@ -38,7 +38,10 @@
 
             },
             handleChange(tag){
-                this.$router.push({path:tag.path})
+                if (this.$route.path !== tag.path && !(this.$route.path ==='/home' && tag.path ==='/')) {
+                    this.$router.push({path:tag.path})
+                }
+                
             },
 
 
