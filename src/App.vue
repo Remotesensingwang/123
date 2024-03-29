@@ -1,20 +1,24 @@
 <template>
     <div>
-        <!-- <el-container>
-            <el-aside width="200px">Aside</el-aside>
-            <el-container>
-                <el-header>Header</el-header>
-                <el-main>Main</el-main>
-            </el-container>
-        </el-container> -->
+        <!-- <Category title="游戏">
+			<template scope="atguigu">
+				<ul>
+					<li v-for="(g,index) in atguigu.games" :key="index">{{atguigu.msg}}</li>
+				</ul>
+            </template>
+        </Category> -->
         <router-view></router-view>
 
     </div>
 </template>
 <script>
+    import Category from './components/Category.vue';
     export default {
         name: "App",
-        // components: { Main },
+        components: { Category },
+        created() {
+            console.dir(this);
+        },
 
     }
 </script>

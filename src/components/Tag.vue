@@ -10,13 +10,22 @@
             @close="handleClose(tag,index)"
             @click="handleChange(tag)">
             {{tag.label}}
-        </el-tag> 
+        </el-tag>
+        <input type="text" name="" id="" v-model="data1">
+        <input type="radio" name="1" id="" :value="1" v-model="data2" > 男
+        <input type="radio" name="1" id="" :value="2" v-model="data2" > 女         
     </div>
 </template>
 <script>
     import {mapState,mapMutations} from 'vuex';
     export default {
         name:'Tag',
+        data() {
+            return {
+                data1:'', //永远都是字符串 除非v-model.number="data1"
+                data2:'' //可以变成数字(:value="1")
+            }
+        },
         computed: {
             ...mapState('tab',{tags:'tabsList'})
         },

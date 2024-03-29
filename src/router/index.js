@@ -99,7 +99,7 @@ router.beforeEach((to,from,next)=>{
     // token不存在 说明没有登录 此时需要跳转到登录页面 如果在登录页面不需要跳转（否则死循环）
     if (!token && to.name !== 'login') {
         next({name:'login'})
-    } else if (token && to.name === 'login') { //token存在，说明用户登录，可以跳转至首页
+    } else if (token && to.name === 'login') { //token存在，说明用户登录，此时如果要跳转的页面是login界面 则直接跳转至首页 
         next({name:'home'})
     } else {
         next()

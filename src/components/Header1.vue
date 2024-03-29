@@ -40,7 +40,12 @@
                 this.isCollapse=!this.isCollapse
                 // this.$store.commit('tab/COLLAPSEMENU') 
                 this.collapsemenu()
+                // this.$nextTick( () =>{
+                //     console.dir(this);
+                //     console.dir('nexttick');
+                // })
                 // this.$bus.$emit('isCollapseevent', this.isCollapse)
+
             },
             topath(item){
                 if (this.$route.path !== item.path && !(this.$route.path ==='/home' && item.path ==='/')){
