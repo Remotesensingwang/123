@@ -7,6 +7,7 @@ import User from '@/view/layout/User'
 import QiTa from '@/view/layout/QiTa'
 import Cookie from 'js-cookie'
 import Login1 from '@/view/login/login'
+import Map from '@/view/map/index'
 const router = new VueRouter({
     // mode:'hash',
     // mode:'history',
@@ -39,6 +40,7 @@ const router = new VueRouter({
                     name: 'qita',
                     path: 'qita',
                     component:QiTa,
+                    redirect:'/qita/pageone',
                     children:[
                         {
                             name: 'pageone',
@@ -67,6 +69,12 @@ const router = new VueRouter({
             name:'login1',
             component:Login1,
             meta:{title:'登录1'}
+        },
+        {
+            path:'/map',
+            name:'map',
+            component:Map,
+            meta:{title:'地图'}
         }
 
     ]

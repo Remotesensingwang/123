@@ -2,6 +2,7 @@
     <div class="header-container">
         <div class="l-content">
               <el-button icon="el-icon-menu" size="small" @click="collapse"></el-button>
+              <el-button  size="small" @click="toMap">地图</el-button>
               <!-- 面包屑 -->
               <!-- <span class="text">首页</span> -->
               <el-breadcrumb separator="/">
@@ -46,6 +47,10 @@
                 // })
                 // this.$bus.$emit('isCollapseevent', this.isCollapse)
 
+            },
+            //跳转到地图
+            toMap(){
+                this.$router.push({name:'map'})
             },
             topath(item){
                 if (this.$route.path !== item.path && !(this.$route.path ==='/home' && item.path ==='/')){
