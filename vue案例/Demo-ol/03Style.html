@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>OpenLayers</title>
+    <link rel="stylesheet" href="./ol/base.css">
+    <link rel="stylesheet" href="./ol/ol.css" type="text/css">
+    <script src="./ol/ol-debug.js"></script>
+</head>
+<body>
+    <div id="map" style="width:500px;height:500px;"></div>
+
+    <script>
+        // 创建要素
+        var source = new ol.source.Vector();
+        source.addFeature(new ol.Feature({
+            geometry: new ol.geom.Point([120.0, 30.0])
+        }));
+        source.addFeature(new ol.Feature({
+            geometry: new ol.geom.Point([120.4, 30.4])
+        }));
+
+        // 创建图层
+        var layer = new ol.layer.Vector({
+            titie:'mytitle',
+            source: source,
+            style: function (feature) {
+                var styles = [];
+                styles.push(
+                    new ol.style.Style({
+                        image: new ol.style.Circle({
+                            radius: 20,
+                            fill: new ol.style.Fill({
+                                color: 'red'
+                            }),
+                            stroke: new ol.style.Stroke({
+                                color: 'red',
+                                width: 1
+                            })
+                        })
+                    })
+                );
+                styles.push(
+                    new ol.style.Style({
+                        geometry: feature.getGeometry(),
+                        image: new ol.style.RegularShape({
+                            radius1: 15,
+                            radius2: 10,
+                            points: 8,
+                            fill: new ol.style.Fill({
+                                color: 'white'
+                            })
+                        })
+                    })
+                );
+                return styles;
+            }
+        });
+
+        // 创建地图
+        var map = new ol.Map({
+            target: 'map',
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                }),
+                layer
+            ],
+            view: new ol.View({
+                projection: 'EPSG:4326',
+                center: [120, 30],
+                zoom: 7
+            })
+        });
+
+        console.log(layer.get('titie'));
+    </script>
+</body>
+</html>

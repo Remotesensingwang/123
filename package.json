@@ -18,6 +18,7 @@
     "less-loader": "^6.0.0",
     "mockjs": "^1.1.0",
     "nanoid": "^5.0.6",
+    "normalize.css": "^8.0.1",
     "ol": "^5.3.3",
     "pubsub-js": "^1.9.4",
     "sass": "^1.72.0",

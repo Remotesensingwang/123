@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./ol/base.css">
+    <link rel="stylesheet" href="./ol/ol.css" type="text/css">
+    <script src="./ol/ol-debug.js"></script>
+    <title>矢量图层</title>
+    <style>
+        body
+        {
+            /* width: 100%;
+                height: 100%; */
+            overflow: hidden;
+        }
+        .footer{
+            position:absolute;
+            bottom:0;
+            left: 200px;
+
+        }
+    </style>
+</head>
+<body>
+    <button onclick="getLayers()">获取图层的缩放等级</button>
+    <button onclick="getAttributions()">获取Source</button>
+    <div id="map" class="map">   
+    </div>
+     <div class="footer">当期做准备</div>
+    <script>
+
+
+
+let a =
+{"type":"FeatureCollection","features":[{"type":"Feature","properties":{},"geometry":{"coordinates":[106.91612950850242,33.10231867014481],"type":"Point"}},{"type":"Feature","properties":{},"geometry":{"coordinates":[108.98155919600106,33.84004268474507],"type":"Point"}},{"type":"Feature","properties":{},"geometry":{"coordinates":[107.92687169600089,35.74357815909232],"type":"Point"}},{"type":"Feature","properties":{},"geometry":{"coordinates":[102.76329747725117,35.25163885013242],"type":"Point"}},{"type":"Feature","properties":{},"geometry":{"coordinates":[119.2436460448829,36.70989121528895],"type":"Point"}},{"type":"Feature","properties":{},"geometry":{"coordinates":[120.43876209684987,36.06074263346085],"type":"Point"}}]}
+
+        var source = new ol.source.Vector({
+            // url: 'https://openlayers.org/en/v3.20.1/examples/data/geojson/switzerland.geojson',
+            features:(new ol.format.GeoJSON()).readFeatures(a),
+            attributions:['© Acme Inc.', '© Bacme Inc.'],
+            // warpX:false
+            // format: new ol.format.GeoJSON()
+        })
+        attr={
+            name:'1231',
+            type:'nicai',
+            arrrr:'qwq'
+        }
+        // source.addFeature(new ol.Feature({
+        //     geometry: new ol.geom.Point([120.0, 30.0]),
+        //     attribute: attr,
+        //     name:'wang'
+        // }));
+
+        var style = new ol.style.Style({
+            fill: new ol.style.Fill({
+                color: 'rgba(255, 255, 255, 0.6)'
+                // color: 'red'
+            }),
+            stroke: new ol.style.Stroke({
+                color: '#319FD3',
+                width: 3
+            }),
+            image: new ol.style.Circle({
+              radius: 5,
+              fill: new ol.style.Fill({
+                color: 'rgba(255, 255, 255, 0.6)'
+              }),
+              stroke: new ol.style.Stroke({
+                color: '#319FD3',
+                width: 10
+              })
+            })
+        })
+        var vectorLayer = new ol.layer.Vector({
+            source: source,
+            style: style
+        })
+        var view = new ol.View({
+            // center: [948178.2879250178, 5902785.869208768],
+            center:[120,34],
+            zoom: 7,
+            minZoom:0,
+            maxZoom:9,
+            projection:'EPSG:4326'
+        })
+        var map = new ol.Map({
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                }),
+                vectorLayer
+            ],
+            target: 'map',
+            view
+        })
+
+        // map.addLayer(vectorLayer)
+
+        // 获取图层的缩放等级以及中心点坐标
+        function getLayers() {
+            let center = map.getView().getCenter()
+            let size = view.getZoom()
+        }
+
+        // 图层源设置 图层有属性 图层源没有（getProperties）有getState
+        // 读取矢量 矢量图层源里面读取Features(要素数据集)
+        // 要素数据集的getProperties有用 getGeometry获取要素类 (几何对象,点线面 有getType类型)
+        function getAttributions() {
+            let layers =map.getLayers()
+            let featureSource =layers.item(1).getSource()
+            if(featureSource.getState() !=='ready') return '没有加载好'
+            featuresProperties=featureSource.getFeatures()[0].getProperties()
+            featureGetGeometry =featureSource.getFeatures()[0].getGeometry().getType() === 'Polygon'
+            console.log(featuresProperties,featureGetGeometry)
+            console.log(featureSource.getProperties());
+            let layerExtent = map.getLayers().item(1).getExtent() //undifind
+            console.log(layerExtent);
+        }
+
+
+    </script>
+</body>
+</html>

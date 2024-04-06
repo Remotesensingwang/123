@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./ol/base.css">
+    <link rel="stylesheet" href="./ol/ol.css" type="text/css">
+    <script src="./ol/ol-debug.js"></script>
+
+    <title>layers</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .map1 {
+        width: 100vw;
+        height: 100vh;
+        }
+        #map{
+        margin-top: 5px;
+        margin-left: 10px;
+        width: calc(100vw - 20px);
+        height: calc(100vh - 50px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="map1">
+        <p>地图1</p>
+        <button onclick="movecenter()">点击</button>
+        <button onclick="movecenter1()">点击向上</button>
+        <button onclick="getLayers()">获取图层</button>
+        <button onclick="getAttributions()">获取Source</button>
+        <div id="map"></div>
+    </div>
+    <script>
+        // 创建第一个地图
+
+        let view = new ol.View({
+            // center: [0, 0],
+            extent: [102, 29, 104, 31],
+            zoom: 10,
+            minZoom: 10,
+            MaxZoom: 14,
+            // 设置成都为地图中心
+            center: [104.06, 30.67],
+            // 指定投影使用EPSG:4326
+            projection: 'EPSG:4326',
+        });
+
+
+        var layer = new ol.layer.Tile({
+            source: new ol.source.OSM()
+        });
+
+
+        let map = new ol.Map({
+            layers: [
+                new ol.layer.Tile({ source: new ol.source.OSM()}),
+                layer
+            ],
+            view,
+            target: 'map'
+        });
+
+
+        // 加载geojson文件，创建资源对象
+        const source = new ol.source.Vector({
+            url: 'https://openlayers.org/en/latest/examples/data/geojson/switzerland.geojson',
+            format: new ol.format.GeoJSON(),
+        })
+
+
+        function movecenter() {
+            center = map.getView().getCenter();
+            size = view.getZoom();
+            var s = ol.proj.transform(center, 'EPSG:3857', 'EPSG:4326');
+            var ss = ol.proj.toLonLat(center);
+            map.render();
+            // console.log(center,s);
+            // console.log(center);
+
+            var la = map.getLayers()
+            console.dir(la);
+            console.log(la);
+        }
+
+        function movecenter1() {
+            var mapCenter = view.getCenter();
+            // 让地图中心的y值减少，即可使得地图向上移动，减少的值根据效果可自由设定
+            mapCenter[1] -= 50000;
+            view.setCenter(mapCenter);
+            map.render();
+            console.dir(map.getViewport());
+        }
+
+        
+        
+        // 图层设置 getSorce setMap  getLength  get(key)
+        // 矢量图层getstyle 
+        function getLayers() {
+            var layersNumber = map.getLayers().getLength() //2
+            var sssss=map.getLayers().length //undifind 不是数组
+            var layerkeys =map.getLayers().item(0).getKeys()
+            let layerExtent = map.getLayers().item(0).getExtent() //undifind
+            let layerProperties = map.getLayers().item(0).getProperties()
+            let layerZindex = map.getLayers().item(0).getZIndex()    //undifind
+            console.log(layersNumber, layerkeys,layerExtent,layerProperties,layerZindex,sssss)
+        }
+
+        
+        // 图层源设置
+        function getAttributions() {
+            let source = map.getLayers().item(1).getSource()
+            // source.setAttributions('© Acme Inc123')
+            source.set('a','12321312')
+            let p = source.getProperties()
+            let p1=source.get('a')
+            // let a = source.getAttributions()[0].getHTML()
+            console.log(source,p)
+            console.log(this);
+        }
+
+        // console.dir(map.target);
+        // console.log(map);
+
+    </script>
+</body>
+
+</html>

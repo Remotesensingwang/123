@@ -5,8 +5,10 @@ import Vuex from 'vuex'
 import store from './store'
 import router from './router'
 import ElementUI from 'element-ui';
-import 'element-ui/lib/theme-chalk/index.css';
+import 'element-ui/lib/theme-chalk/index.css'
 import './api/mock'
+// import  'normalize.css'
+import '../public/base.css'
 
 Vue.config.productionTip = false
 

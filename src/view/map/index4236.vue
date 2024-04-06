@@ -1,4 +1,5 @@
 <template>
+    
      <el-container>
         <el-header><Header_map/></el-header>
         <el-main>
@@ -7,28 +8,13 @@
                 <a href="#" id="popup-closer" class="ol-popup-closer" ref="closer" @click="handleClose"></a>
                 <div id="popup-content" ref="content"></div>
             </div>
-            <!-- 图层列表 -->
             <div class="layers-list">
                 <ul>
                     <li v-for="(layer,index) in layers" :key="index">
-                        <input type="checkbox" :checked='layer.visible' @change="handleChange(layer.name,index)">{{layer.name}}
-                    </li>
+                        <input type="checkbox" :checked='layer.visible' @change="handleChange(layer.name,index)">{{layer.name}}</li>
                 </ul>
             </div>
-            
-            <!-- 绘制列表 -->
-            <div class="draw-list">
-                <el-button  type="primary" @click="drawGmo('point')">点</el-button>
-                <el-button  type="primary" @click="drawGmo('lineString')">线</el-button>
-                <el-button  type="primary" @click="drawGmo('polygon')">面</el-button>
-                <el-button  type="primary" @click="stopDraw">停止绘图</el-button>
-                <el-button  type="primary" @click="removeDraw">移除绘图</el-button>
-            </div>
-            <!-- 坐标显示 -->
-            <div class="coor" v-show="Lon">
-                经度:{{Lon}} 维度:{{Lat}} 层级:{{layer}}
-            </div>
-        </el-main>
+            </el-main>
     </el-container>   
     
 </template>
@@ -43,10 +29,8 @@
     import GeoJSON from 'ol/format/GeoJSON'
     import {Style,Icon,Stroke,Fill,Circle} from 'ol/style'
     import Overlay from 'ol/Overlay'
-    import {getCenter,boundingExtent, closestSquaredDistanceXY} from 'ol/extent'
-    import {fromLonLat,transform} from 'ol/proj'
-    import {Draw,Select} from 'ol/interaction'
-
+    import {getCenter,boundingExtent} from 'ol/extent';
+    // import moduleName from '../../../src/';
     export default {
         data() {
             return {
@@ -56,37 +40,24 @@
                     // {
                     //     name:'layer',visible:true
                     // }
-                ],
-                draw:null,
-                VectorDraw:null,
-                lineLayer:null,
-                Lon:0,
-                Lat:0,
-                layer:5,
+                ]
             }
         },
         components:{Header_map},
         methods: {
             initMap(){
-                const center =  fromLonLat([103.39, 35.56])
-                // alert(transform(map.getEventCoordinate(event), 'EPSG:3857', 'EPSG:4326'))
-                // var projection = new ol.proj.get("EPSG:3857")
-
-                this.map
-
                 const view =new View({
                     // center: [0, 0],
-                    // extent: [80, 20, 130, 40],
-                    extent: [center[0]-5000000, center[1]-5000000, center[0]+5000000, center[1]+5000000],
+                    extent: [80, 20, 130, 40],
                     zoom: 5,
                     minZoom: 5,
                     MaxZoom: 14,
                     // 设置成都为地图中心
-                    center: center,
+                    center: [103.39, 35.56],
                     // 指定投影使用EPSG:4326
-                    // projection: 'EPSG:4326',
+                    projection: 'EPSG:4326',
                 })
-                
+
                 const OSMLayer = new TileLayer({
                     source: new OSM(),
                     name:'OSM',
@@ -102,14 +73,10 @@
                     source: new XYZ({url:'http://www.google.cn/maps/vt/pb=!1m4!1m3!1i{z}!2i{x}!3i{y}!2m3!1e0!2sm!3i345013117!3m8!2szh-CN!3scn!5e1105!12m4!1e68!2m2!1sset!2sRoadmap!4e0',wrapX:false}),
                     name:'谷歌街道'
                 })
-
-
                 const gaodeLayer = new TileLayer({
                     source: new XYZ({
                         url:'http://webst0{1-4}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}', wrapX:false}),
-                        name:'高德'
-                })
-                
+                        name:'高德'})
                 const bingLayer =new TileLayer({
                     source: new BingMaps({
                         key: 'AmMEWaIe7beWhvJ6ZRBqm-8bQBx3fjaZcUhq-37IFmbpA6jWaqOsld0vxEYMFdIf',
@@ -124,7 +91,7 @@
                         url: 'https://geo.datav.aliyun.com/areas_v3/bound/geojson?code=100000_full',
                     }),
                     name:'中国'
-                })
+                    })
 
                 this.map =new Map({
                     layers: [
@@ -133,54 +100,13 @@
                         googleLayer1,
                         bingLayer,
                         OSMLayer,
-                        // geojsonChinaLayer
+                        geojsonChinaLayer
                     ],
                     view,
                     target: 'map'
                 })
 
-                // 添加一个用于选择Feature的交互方式
-                const clickSelect = new Select({
-                    multi: true,//可以选择多个features
-                    style: new Style({
-                        image: new Circle({
-                            radius: 10,
-                            fill: new Fill({
-                                color: 'blue'
-                            })
-                        })
-                    })
-                });
-                this.map.addInteraction(clickSelect)
-
-                // // 添加一个绘制使用的layer
-                // this.VectorDraw = new Vector()
-                // this.lineLayer =  new VectorLayer({
-                //     name: 'c1',
-                //     source: this.VectorDraw,
-                //     style: new Style({
-                //         stroke: new Stroke({
-                //             color: 'red',
-                //             size: 1
-                //         }),
-                //         fill: new Fill({
-                //             color: 'magenta'
-                //         }),
-                //         image: new Circle({
-                //             radius: 10,
-                //             fill: null,
-                //             stroke: new Stroke({
-                //                 color: 'magenta'
-                //             })
-                //         })
-                //     })
-                // })
-            
-                // // 绘图的矢量图层添加
-                // this.map.addLayer(this.lineLayer)
-
-                // console.log('initmap',this.map.getLayers());               
-                
+                console.log('initmap',this.map.getLayers());               
                 this.setMarker()
                 this.addOverlay()
                 this.map.on('singleclick',this.singleClick)
@@ -190,33 +116,23 @@
                     this.layers.push({name:layer.get('name'),visible:layer.getVisible()}) 
                 })
 
-                //***********************通过监视视图的分辨率变化来获取当前视图的缩放等级*******
-                this.map.getView().on('change:resolution',  () =>{
-                    this.layer = parseInt(this.map.getView().getZoom())
-                    console.log(this.layer,'layer');
-                    // console.log(parseInt(this.getZoom()))
-                })
+                // const a=ol.proj.fromLonLat([-72.980624870461128, 48.161307640513321])
             },
-            
+
             //设置图层列表的显示与隐藏
             handleChange(name,index){
                 this.layers.forEach((layer)=>{
 					if(layer.name === name){
                         layer.visible = !layer.visible
-                        // this.map.getLayers().item(index).setVisible(layer.visible)
-                        this.map.getLayers().getArray().filter(layer =>{
-                            return layer.get('name') === name
-                        })[0].setVisible(layer.visible)
+                        this.map.getLayers().item(index).setVisible(layer.visible)
                     }
 				})      
             },
-
             //添加矢量图层
             setMarker(){
                 const image=new Icon(({
                     anchor: [0.5, 0.9],
-                    src: 'http://support.supermap.com.cn:8090/iserver/iClient/forJavaScript/examples/img/markerbig_select.png',
-                    // scale: this.map.getView().getZoom() / 10
+                    src: 'http://support.supermap.com.cn:8090/iserver/iClient/forJavaScript/examples/img/markerbig_select.png'
                 }))
                 const styles = {
                     'Point': new Style({
@@ -283,7 +199,7 @@
                     })
                 }
                 
-                const styleFunction = function(feature,resolution) {
+                const styleFunction = function(feature) {
                     return styles[feature.getGeometry().getType()]
                 }
 
@@ -327,9 +243,7 @@
                 } 
 
                 const vectorSource = new Vector({
-                    features: (new GeoJSON()).readFeatures(qingdao,{
-                        featureProjection:'EPSG:3857'
-                    })
+                    features: (new GeoJSON()).readFeatures(qingdao)
                 })
               
                 const vectorLayer = new VectorLayer({
@@ -355,25 +269,23 @@
             //鼠标单击地图显示overlays
             singleClick(e){
                 let select = false
-                // console.log(e);
                 const content = this.$refs.content
                 this.map.forEachFeatureAtPixel(e.pixel,  (feature) => {
-                // console.log('feature',feature)
-                if (feature.getProperties().name) {
+                if (feature.getProperties().adcode) {
+                    // var contentHTML = feature.getProperties().name;
                     const contentHTML=this.mark(feature.getProperties())
                     content.innerHTML = contentHTML;
-                    this.overlay.setPosition(feature.getGeometry().getCoordinates()) //点坐标
-                    // this.overlay.setPosition(fromLonLat(feature.get('center'))) //各个省会城市坐标（fromLonLat(feature.getProperties().center)）
+                    // console.log(feature.getProperties());
+                    // this.overlay.setPosition(feature.getGeometry().getCoordinates());
+                    this.overlay.setPosition(feature.getProperties().center)
+                    var extent = boundingExtent(feature.getGeometry().getCoordinates()[0][0]); //获取一个坐标数组的边界，格式为[minx,miny,maxx,maxy]
+                    var center = getCenter(extent);   //获取边界区域的中心位置
+                    // map.getView().setCenter(center);  //设置当前地图的显示中心位置
+                    console.log(feature.getGeometry().getCoordinates(),center,extent);
+                    console.log(feature.getProperties().center);
+
+
                     select=true
-                    
-                    //#region 
-                        // var extent = boundingExtent(feature.getGeometry().getCoordinates()[0][0]); //获取一个坐标数组的边界，格式为[minx,miny,maxx,maxy]
-                        // var center = getCenter(extent);   //获取边界区域的中心位置
-                        // map.getView().setCenter(center);  //设置当前地图的显示中心位置
-                        // console.log(feature.getGeometry().getCoordinates(),center,extent);
-                        // console.log(feature.getProperties().center);
-                    //#endregion
-                    
                 }
                 })
                 if(!select){
@@ -384,12 +296,8 @@
             //鼠标移动事件 显示小手
             pointerMove(e){
                 let select = false
-                let coordinate = transform( e.coordinate, 'EPSG:3857', 'EPSG:4326')
-                // console.log(coordinate);
-                this.Lon=coordinate[0].toFixed(3)
-                this.Lat=coordinate[1].toFixed(3)
                 this.map.forEachFeatureAtPixel(e.pixel,  (feature) => {
-                if (feature) { //feature.getProperties().name
+                if (feature.getProperties().name) {
                     this.map.getTargetElement().style.cursor = 'pointer';
                     select=true
                 }
@@ -425,72 +333,8 @@
                     </tbody>
                 </table>
                 `
-            },
-            // 绘图函数
-            drawGmo(type){
-                
-                // 添加一个绘制使用的layer
-                this.VectorDraw = this.VectorDraw ? this.VectorDraw :  new Vector()
-                this.lineLayer =  this.lineLayer ? this.lineLayer : new VectorLayer({
-                    name: 'c1',
-                    source: this.VectorDraw,
-                    style: new Style({
-                        stroke: new Stroke({
-                            color: 'red',
-                            size: 1
-                        }),
-                        fill: new Fill({
-                            color: 'magenta'
-                        }),
-                        image: new Circle({
-                            radius: 10,
-                            fill: null,
-                            stroke: new Stroke({
-                                color: 'magenta'
-                            })
-                        })
-                    })
-                })
-            
-                // 绘图的矢量图层添加
-                if (this.map.getLayers().getArray().findIndex(item => {
-                    return item.get('name') === this.lineLayer.get('name')
-                }) === -1) {
-                    this.map.addLayer(this.lineLayer)
-                }
-                console.log(this.map.getLayers(),'base')
-                //设置绘图函数
-                const typeList = { point: 'Point', polygon: 'Polygon', lineString: 'LineString' }
-                if (this.draw) this.map.removeInteraction(this.draw)
-                this.draw = new Draw({
-                    type: typeList[type],
-                    stopClick: true, //点击鼠标不会触发其他的事件
-                    source: this.VectorDraw    // 注意设置source，这样绘制好的线，就会添加到这个source里
-                })
-                if (this.draw) {
-                    this.map.addInteraction(this.draw)
-                }
-            },
-            //停止绘图
-            stopDraw(){
-                this.map.removeInteraction(this.draw)   
-                // region
-                    // this.map.on('dblclick', function () {
-                    //     this.map.removeInteraction(this.draw)
-                    //     console.log(this);
-                    // })
-                // endregion
-            
-            },
-            //清除绘图
-            removeDraw(){
-                this.stopDraw()
-                this.VectorDraw.clear()
-                this.lineLayer.setSource(this.VectorDraw)
-                this.map.removeLayer(this.lineLayer)
-                console.log(this.map.getLayers())
-                // VectorDraw=new ol.source.Vector()
-            },
+            }
+
         },
         mounted() {
             this.initMap()
@@ -569,12 +413,6 @@
                 padding-left: 5px;
                 // padding: 10px;
             }
-        }
-        .draw-list{
-            position: absolute;
-            top:70px;
-            right: 170px;
-            // background-color: #333333;
         }
     }
 </style>
