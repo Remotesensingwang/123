@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./ol/base.css">
+    <link rel="stylesheet" href="./ol/ol.css" type="text/css">
+    <script src="./ol/ol-debug.js"></script>
+    <title>瓦片坐标</title>
+</head>
+<body>
+    <button onclick="getzoom()">123123</button>
+    <div id="map" style="width: 100%"></div>
+    <script type="text/javascript">
+        var osmSource = new ol.source.OSM({ wrapX:false})
+        var osm= new ol.layer.Tile({
+            source: osmSource,
+            // extent:[0,0,50000,50000] //layer getExtent()读取这个属性 view没有getExtent()
+        })
+        var google =new ol.source.XYZ({url:'https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',wrapX:false})
+        /* 定义百度地图分辨率与瓦片网格 */
+        var resolutions = [];
+        for (var i = 0; i < 20; i++) {
+            resolutions[i] = Math.pow(2, 18 - i);
+        }
+
+        var tilegrid = new ol.tilegrid.TileGrid({
+            origin: [0, 0],
+            resolutions: resolutions,
+            tileSize: [256, 256],
+        });
+
+        var baiduMapLayer = new ol.layer.Tile({
+            title: '百度地图瓦片图',
+            source: new ol.source.TileImage({
+                projection: 'EPSG:3857',
+                tileGrid: tilegrid,
+                tilePixelRatio: 2,
+                tileUrlFunction: function (tileCoord, pixelRatio, proj) {
+                    if (!tileCoord) {
+                        return '';
+                    }
+                    console.log(tileCoord);
+                    var z = tileCoord[0];
+                    var x = tileCoord[1];
+                    var y = tileCoord[2];
+
+                    if (x < 0) {
+                        x = 'M' + (-x);
+                    }
+
+                    if (y < 0) {
+                        y = 'M' + (-y);
+                    }
+                    return 'https://maponline0.bdimg.com/tile/?qt=vtile&x=' + x + '&y=' + y + '&z=' + z + '&styles=pl&scaler=1&udt=20230730&from=jsapi3_0';
+                }
+            })
+        })
+        
+        //tms
+        var projection = new ol.proj.get("EPSG:3857");
+        var projectionExtent = projection.getExtent();
+        var tilegrid1 = new ol.tilegrid.TileGrid({
+            origin: ol.extent.getTopLeft(projectionExtent),  // WMTS Origin在左上角，origin位置不能变；
+            resolutions: osmSource.getTileGrid().getResolutions(),
+            extent: projectionExtent,
+            tileSize: [256, 256],
+        });
+
+       
+        var tms =new ol.source.TileImage({
+                projection: 'EPSG:3857',
+                tileGrid: tilegrid1,
+                tileUrlFunction: function (tileCoord, pixelRatio, proj) {
+                    if (!tileCoord) {
+                    return "";
+                    }
+                    console.log(tileCoord);
+                    var z = tileCoord[0];
+                    var x = tileCoord[1];
+                    var y = -tileCoord[2] - 1; // y轴取反，-1目的是为了从0开始计数；
+
+                    return ''; // 自行设置URL ，请注意 WMTS中用TileRow标识Y，用TileCol表示X；
+                }
+        })
+
+        const bingLayer =new ol.layer.Tile({
+            source: new ol.source.BingMaps({
+                key: 'AmMEWaIe7beWhvJ6ZRBqm-8bQBx3fjaZcUhq-37IFmbpA6jWaqOsld0vxEYMFdIf',
+                imagerySet: 'Aerial',
+                wrapX:false
+            }),
+            name:'BingMaps'
+        })
+        var map = new ol.Map({
+            layers: [
+                // 加载Open Street Map地图
+            // new ol.layer.Tile({
+            //     source: google
+            // }),
+            // new ol.layer.Tile({
+            //     source: osmSource,
+            //     opacity:0.7,
+               
+            // }),
+            bingLayer,
+            baiduMapLayer,        
+            new ol.layer.Tile({
+                source: tms
+            }),
+            // 添加一个显示Open Street Map地图瓦片网格的图层
+            new ol.layer.Tile({
+                source: new ol.source.TileDebug({
+                projection: 'EPSG:3857',
+                tileGrid: baiduMapLayer.getSource().getTileGrid(),
+                // tileGrid: tilegrid1,
+                wrapX:false
+                })
+            })
+            ],
+            target: 'map',
+            view: new ol.View({
+            center: ol.proj.transform(
+                [104, 30], 'EPSG:4326', 'EPSG:3857'),
+            zoom: 1,
+            projection: 'EPSG:3857',
+            })
+        })
+        function getzoom() {
+            console.log(map.getView().getZoom())
+            console.log(map.getView().getResolution())
+            if (bingLayer.getSource().getState()==='ready') {
+                console.log(bingLayer.getSource().getTileGrid())
+                map.addLayer(new ol.layer.Tile({
+                source: new ol.source.TileDebug({
+                projection: 'EPSG:3857',
+                tileGrid: bingLayer.getSource().getTileGrid(),
+                // tileGrid: gaode.getTileGrid(),
+                wrapX:false
+                })
+            }))
+            }
+        }
+        console.log('@@@',baiduMapLayer.getSource().getTileGrid().getResolutions())
+        console.log('@@@@',osmSource.getTileGrid().getResolutions())
+        console.log('top',ol.extent.getTopLeft(projectionExtent))
+        console.log('bottom',ol.extent.getBottomLeft(projectionExtent))
+    </script>
+</body>
+</html>

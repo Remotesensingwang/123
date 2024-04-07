@@ -38,7 +38,7 @@
     import Map from 'ol/Map'
     import View from 'ol/View'
     import TileLayer from 'ol/layer/Tile'
-    import {OSM,Vector,XYZ,BingMaps} from 'ol/source'
+    import {OSM,Vector,XYZ,BingMaps,TileDebug} from 'ol/source'
     import VectorLayer from 'ol/layer/Vector';
     import GeoJSON from 'ol/format/GeoJSON'
     import {Style,Icon,Stroke,Fill,Circle} from 'ol/style'
@@ -107,7 +107,7 @@
                 const gaodeLayer = new TileLayer({
                     source: new XYZ({
                         url:'http://webst0{1-4}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}', wrapX:false}),
-                        name:'高德'
+                    name:'高德'
                 })
                 
                 const bingLayer =new TileLayer({
@@ -134,11 +134,21 @@
                         bingLayer,
                         OSMLayer,
                         // geojsonChinaLayer
+                        // 添加一个显示Open Street Map地图瓦片网格的图层
+                        new TileLayer({
+                            name:'OSM瓦片',
+                            source: new TileDebug({
+                            projection: 'EPSG:3857',
+                            // tileGrid: baiduMapLayer.getSource().getTileGrid(),
+                            tileGrid: OSMLayer.getSource().getTileGrid(),
+                            wrapX:false
+                            })
+                        })
                     ],
                     view,
                     target: 'map'
                 })
-
+                console.log(OSMLayer.getSource().getTileGrid().getOrigin());
                 // 添加一个用于选择Feature的交互方式
                 const clickSelect = new Select({
                     multi: true,//可以选择多个features
