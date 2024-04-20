@@ -18,18 +18,18 @@ module.exports = defineConfig({
   	//开启代理服务器（方式二）
 	devServer: {
     proxy: {
-      '/student': {
-        target: 'http://localhost:5000',
-				pathRewrite:{'^/student':''},
-        // ws: true, //用于支持websocket
-        // changeOrigin: true //用于控制请求头中的host值
-      },
       '/car': {
         target: 'http://localhost:5001',
 				pathRewrite:{'^/car':''},
         // ws: true, //用于支持websocket
         // changeOrigin: true //用于控制请求头中的host值
-      }
+      },
+      '/place/v2/search?query=4A%E6%99%AF%E5%8C%BA&tag=%E6%97%85%E6%B8%B8%E6%99%AF%E7%82%B9&region=%E6%AD%A6%E6%B1%89&output=json&ak=M0BSRvYgSAsRMdO6AUxG9FDkDfChgAoG': {
+        target: 'http://api.map.baidu.com'
+      },
+      '/api/students': {
+        target: 'http://localhost:5003',
+      },
     }
   }
 

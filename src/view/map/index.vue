@@ -38,15 +38,18 @@
     import Map from 'ol/Map'
     import View from 'ol/View'
     import TileLayer from 'ol/layer/Tile'
-    import {OSM,Vector,XYZ,BingMaps,TileDebug} from 'ol/source'
+    import {OSM,Vector,XYZ,BingMaps,TileDebug,Cluster} from 'ol/source'
     import VectorLayer from 'ol/layer/Vector';
     import GeoJSON from 'ol/format/GeoJSON'
-    import {Style,Icon,Stroke,Fill,Circle} from 'ol/style'
+    import {Style,Icon,Stroke,Fill,Circle,Text} from 'ol/style'
     import Overlay from 'ol/Overlay'
     import {getCenter,boundingExtent, closestSquaredDistanceXY} from 'ol/extent'
     import {fromLonLat,transform} from 'ol/proj'
     import {Draw,Select} from 'ol/interaction'
-
+    import axios from 'axios'
+    import Feature from 'ol/Feature'
+    import Point from 'ol/geom/Point'
+    import {getPoint} from '@/api'
     export default {
         data() {
             return {
@@ -133,7 +136,7 @@
                         googleLayer1,
                         bingLayer,
                         OSMLayer,
-                        // geojsonChinaLayer
+                        // geojsonChinaLayer,
                         // 添加一个显示Open Street Map地图瓦片网格的图层
                         new TileLayer({
                             name:'OSM瓦片',
@@ -148,20 +151,27 @@
                     view,
                     target: 'map'
                 })
-                console.log(OSMLayer.getSource().getTileGrid().getOrigin());
+                console.log(OSMLayer.getSource().getTileGrid().getOrigin()); //topleft
                 // 添加一个用于选择Feature的交互方式
                 const clickSelect = new Select({
                     multi: true,//可以选择多个features
                     style: new Style({
-                        image: new Circle({
-                            radius: 10,
-                            fill: new Fill({
-                                color: 'blue'
-                            })
+                        // image: new Circle({
+                        //     radius: 10,
+                        //     fill: new Fill({
+                        //         color: 'blue'
+                        //     })
+                        // }),
+                        fill: new Fill({
+                            color: 'rgba(255, 255, 255, 0.4)'
+                        }),
+                        stroke: new Stroke({
+                            color: 'red',
+                            width: 1
                         })
                     })
                 });
-                this.map.addInteraction(clickSelect)
+                // this.map.addInteraction(clickSelect)
 
                 // // 添加一个绘制使用的layer
                 // this.VectorDraw = new Vector()
@@ -341,14 +351,43 @@
                         featureProjection:'EPSG:3857'
                     })
                 })
-              
+                //聚类图层源
+                const clusterSource = new Cluster({
+                    source:vectorSource
+                })
+                const vectorLayerCluster = new VectorLayer({
+                    name:'features聚类',
+                    source: clusterSource,
+                    style: function (feature){
+                        // console.log('@@@@@',feature.get('features')[0].get('name'));
+                        let size= feature.get('features').length
+                        let style=[]
+                        style.push(styles[feature.getGeometry().getType()])
+                        let style1 =new Style({
+                            text: new Text({
+                                font: '12px Calibri,sans-serif',
+                                text: size.toString(),
+                                fill: new Fill({
+                                    color: '#eee',
+                                    border: 5,
+                                    width: 3
+                                }),
+                                offsetX:0,
+                                offsetY:-17,
+                            })
+                        })
+                        style.push(style1)
+                        return style
+                    }
+                })
+        
                 const vectorLayer = new VectorLayer({
                     source: vectorSource,
                     style: styleFunction,
                     name:'shandong'
                 })
 
-                this.map.addLayer(vectorLayer)
+                this.map.addLayer(vectorLayerCluster)
             },
             //添加overlay图层
             addOverlay(){
@@ -364,14 +403,20 @@
             },
             //鼠标单击地图显示overlays
             singleClick(e){
+                // e.stopPropagation()
                 let select = false
                 // console.log(e);
                 const content = this.$refs.content
                 this.map.forEachFeatureAtPixel(e.pixel,  (feature) => {
-                // console.log('feature',feature)
-                if (feature.getProperties().name) {
-                    const contentHTML=this.mark(feature.getProperties())
-                    content.innerHTML = contentHTML;
+                console.log('feature',feature.get('attr1'))
+                // if (feature.get('features')) { //聚类图
+                // if (feature.getProperties().name) { //青岛三个
+                if (feature.get('attr')) { //武汉
+                    
+                    const contentHTML=this.mark(feature.getProperties().attr)
+                    // const contentHTML=this.mark(feature.get('features')[0].getProperties())
+                    console.log('@@@@',feature.getProperties());
+                    content.innerHTML = contentHTML
                     this.overlay.setPosition(feature.getGeometry().getCoordinates()) //点坐标
                     // this.overlay.setPosition(fromLonLat(feature.get('center'))) //各个省会城市坐标（fromLonLat(feature.getProperties().center)）
                     select=true
@@ -501,10 +546,132 @@
                 console.log(this.map.getLayers())
                 // VectorDraw=new ol.source.Vector()
             },
+            addfeature(){
+                const image=new Icon(({
+                    anchor: [0.5, 0.9],
+                    src: 'http://support.supermap.com.cn:8090/iserver/iClient/forJavaScript/examples/img/markerbig_select.png',
+                    // scale: this.map.getView().getZoom() / 10
+                }))
+                const styles = {
+                    'Point': new Style({
+                    image: image
+                    }),
+                    'LineString': new Style({
+                    stroke: new Stroke({
+                        color: 'green',
+                        width: 1
+                    })
+                    }),
+                    'MultiLineString': new Style({
+                    stroke: new Stroke({
+                        color: 'green',
+                        width: 1
+                    })
+                    }),
+                    'MultiPoint': new Style({
+                    image: image
+                    }),
+                    'MultiPolygon': new Style({
+                    stroke: new Stroke({
+                        color: 'yellow',
+                        width: 1
+                    }),
+                    fill: new Fill({
+                        color: 'rgba(255, 255, 0, 0.1)'
+                    })
+                    }),
+                    'Polygon': new Style({
+                    stroke: new Stroke({
+                        color: 'blue',
+                        lineDash: [4],
+                        width: 3
+                    }),
+                    fill: new Fill({
+                        color: 'rgba(0, 0, 255, 0.1)'
+                    })
+                    }),
+                    'GeometryCollection': new Style({
+                    stroke: new Stroke({
+                        color: 'magenta',
+                        width: 2
+                    }),
+                    fill: new Fill({
+                        color: 'magenta'
+                    }),
+                    image: new Circle({
+                        radius: 10,
+                        fill: null,
+                        stroke: new Stroke({
+                        color: 'magenta'
+                        })
+                    })
+                    }),
+                    'Circle': new Style({
+                    stroke: new Stroke({
+                        color: 'red',
+                        width: 2
+                    }),
+                    fill: new Fill({
+                        color: 'rgba(255,0,0,0.2)'
+                    })
+                    })
+                }     
+                const styleFunction = function(feature,resolution) {
+                    return styles[feature.getGeometry().getType()]
+                }
+                // getPoint().then(
+                //     response => {
+                //         let points = response.data.results
+                //         let features =[]
+                //         console.log('123123123',response.data.results)
+                //     }
+                // )
+                axios.get('http://localhost:8080/api/students').then(  
+                    response => {
+                        let points = response.data.results
+                        let features =[]
+                        points.forEach(point => {
+                            const feature = new Feature({
+                                geometry: new Point(fromLonLat([point.location.lng,point.location.lat])),
+                                attr:point
+                            })
+                            features.push(feature)
+                        })
+                        console.log(features);
+                        const vectorSource = new Vector({
+                            features: features
+                        })
+                        const vectorLayer = new VectorLayer({
+                            source: vectorSource,
+                            style: styleFunction,
+                            name:'wuhan'
+                        })
+
+                        this.map.addLayer(vectorLayer)
+                    },
+                    error => {
+                        console.log('请求失败了',error.message)
+                    }
+			    )
+            },
         },
         mounted() {
-            this.initMap()
-        },
+            this.initMap(),
+            this.addfeature()
+            const ipAddress = 'http://api.map.baidu.com/place/v2/search?query=4A%E6%99%AF%E5%8C%BA&tag=%E6%97%85%E6%B8%B8%E6%99%AF%E7%82%B9&region=%E6%AD%A6%E6%B1%89&output=json&ak=M0BSRvYgSAsRMdO6AUxG9FDkDfChgAoG'
+            const urlObject = new URL(ipAddress)
+            const baseUrl = urlObject.origin + urlObject.port
+            console.log(urlObject,baseUrl)
+			// axios.get('http://localhost:8080/place/v2/search?query=4A%E6%99%AF%E5%8C%BA&tag=%E6%97%85%E6%B8%B8%E6%99%AF%E7%82%B9&region=%E6%AD%A6%E6%B1%89&output=json&ak=M0BSRvYgSAsRMdO6AUxG9FDkDfChgAoG').then(
+            axios.get('http://localhost:8080/api/students').then(  
+                response => {
+                    // console.log('请求成功了',response.data.results)
+                },
+                error => {
+                    console.log('请求失败了',error.message)
+                }
+			)
+        }
     }
 </script>
 <style lang="less" scoped>

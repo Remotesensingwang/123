@@ -15,6 +15,13 @@ export function getData (){
   }) 
 }
 
+export function getPoint (){
+  return request({
+    url:'/students',
+    method:'get',
+  }) 
+}
+
 
 
 // 请求用户 如果用这个 User.vue中要使用
