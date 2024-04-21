@@ -29,6 +29,7 @@ module.exports = defineConfig({
       },
       '/api/students': {
         target: 'http://localhost:5003',
+        // ws:false
       },
     }
   }

@@ -151,7 +151,9 @@
                     view,
                     target: 'map'
                 })
-                console.log(OSMLayer.getSource().getTileGrid().getOrigin()); //topleft
+                let range =this.map.getView().calculateExtent(this.map.getSize())
+                // console.log(range)
+                // console.log(OSMLayer.getSource().getTileGrid().getOrigin()); //topleft
                 // 添加一个用于选择Feature的交互方式
                 const clickSelect = new Select({
                     multi: true,//可以选择多个features
@@ -213,7 +215,8 @@
                 //***********************通过监视视图的分辨率变化来获取当前视图的缩放等级*******
                 this.map.getView().on('change:resolution',  () =>{
                     this.layer = parseInt(this.map.getView().getZoom())
-                    console.log(this.layer,'layer');
+                    // console.log('mapsize',this.map.getSize())
+                    // console.log(this.layer,'layer');
                     // console.log(parseInt(this.getZoom()))
                 })
             },
@@ -408,14 +411,14 @@
                 // console.log(e);
                 const content = this.$refs.content
                 this.map.forEachFeatureAtPixel(e.pixel,  (feature) => {
-                console.log('feature',feature.get('attr1'))
+                // console.log('feature',feature.get('attr1'))
                 // if (feature.get('features')) { //聚类图
                 // if (feature.getProperties().name) { //青岛三个
                 if (feature.get('attr')) { //武汉
                     
                     const contentHTML=this.mark(feature.getProperties().attr)
                     // const contentHTML=this.mark(feature.get('features')[0].getProperties())
-                    console.log('@@@@',feature.getProperties());
+                    // console.log('@@@@',feature.getProperties());
                     content.innerHTML = contentHTML
                     this.overlay.setPosition(feature.getGeometry().getCoordinates()) //点坐标
                     // this.overlay.setPosition(fromLonLat(feature.get('center'))) //各个省会城市坐标（fromLonLat(feature.getProperties().center)）
@@ -467,8 +470,8 @@
                   <table border="1" class="project-popup" style="border-collapse: collapse;">
                     <thead>
                         <tr>
-                        <th>属性</th>
-                        <th>内容</th>
+                            <th>属性</th>
+                            <th>内容</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -477,6 +480,17 @@
                             <td>${project.name}</td>
                         </tr>
                         <tr>
+                            <td>非遗项目地址</td>
+                            <td>${project.address}</td>
+                        </tr>
+                        <tr>
+                            <td>非遗项目电话</td>
+                            <td>${project.telephone ? project.telephone : '无'}</td>
+                        </tr>
+                        <tr>
+                            <td>非遗项目地区</td>
+                            <td>${project.province + project.city + project.area}</td>
+                        </tr>                                                
                     </tbody>
                 </table>
                 `
@@ -546,6 +560,7 @@
                 console.log(this.map.getLayers())
                 // VectorDraw=new ol.source.Vector()
             },
+            //添加武汉景区
             addfeature(){
                 const image=new Icon(({
                     anchor: [0.5, 0.9],
@@ -619,14 +634,7 @@
                 const styleFunction = function(feature,resolution) {
                     return styles[feature.getGeometry().getType()]
                 }
-                // getPoint().then(
-                //     response => {
-                //         let points = response.data.results
-                //         let features =[]
-                //         console.log('123123123',response.data.results)
-                //     }
-                // )
-                axios.get('http://localhost:8080/api/students').then(  
+                getPoint().then(
                     response => {
                         let points = response.data.results
                         let features =[]
@@ -637,7 +645,8 @@
                             })
                             features.push(feature)
                         })
-                        console.log(features);
+                        // console.log(features);
+
                         const vectorSource = new Vector({
                             features: features
                         })
@@ -651,26 +660,23 @@
                     },
                     error => {
                         console.log('请求失败了',error.message)
-                    }
-			    )
+                    }                        
+                )
             },
         },
         mounted() {
             this.initMap(),
             this.addfeature()
-            const ipAddress = 'http://api.map.baidu.com/place/v2/search?query=4A%E6%99%AF%E5%8C%BA&tag=%E6%97%85%E6%B8%B8%E6%99%AF%E7%82%B9&region=%E6%AD%A6%E6%B1%89&output=json&ak=M0BSRvYgSAsRMdO6AUxG9FDkDfChgAoG'
-            const urlObject = new URL(ipAddress)
-            const baseUrl = urlObject.origin + urlObject.port
-            console.log(urlObject,baseUrl)
-			// axios.get('http://localhost:8080/place/v2/search?query=4A%E6%99%AF%E5%8C%BA&tag=%E6%97%85%E6%B8%B8%E6%99%AF%E7%82%B9&region=%E6%AD%A6%E6%B1%89&output=json&ak=M0BSRvYgSAsRMdO6AUxG9FDkDfChgAoG').then(
-            axios.get('http://localhost:8080/api/students').then(  
-                response => {
-                    // console.log('请求成功了',response.data.results)
-                },
-                error => {
-                    console.log('请求失败了',error.message)
-                }
-			)
+            console.log('mounted',this)
+
+            // axios.get('http://localhost:8080/api/students').then(  
+            //     response => {
+            //         // console.log('请求成功了',response.data.results)
+            //     },
+            //     error => {
+            //         console.log('请求失败了',error.message)
+            //     }
+			// )
         }
     }
 </script>
@@ -689,43 +695,61 @@
         border: 1px solid #cccccc;
         bottom: 12px;
         left: -50px;
-        min-width: 180px;
+        min-width: 300px;
+        &:after, &:before {
+            top: 100%;
+            border: solid transparent;
+            content: " ";
+            height: 0;
+            width: 0;
+            position: absolute;
+            pointer-events: none;
+        }
+        &:after{
+            border-top-color: white;
+            border-width: 10px;
+            left: 48px;
+            margin-left: -10px;
+        }
+        &:before{
+            border-top-color: #cccccc;
+            border-width: 11px;
+            left: 48px;
+            margin-left: -11px;
+        }
 	}
-    .ol-popup:after,
-    .ol-popup:before {
-        top: 100%;
-        border: solid transparent;
-        content: " ";
-        height: 0;
-        width: 0;
-        position: absolute;
-        pointer-events: none;
-    }
-
-    .ol-popup:after {
-        border-top-color: white;
-        border-width: 10px;
-        left: 48px;
-        margin-left: -10px;
-    }
-
-    .ol-popup:before {
-        border-top-color: #cccccc;
-        border-width: 11px;
-        left: 48px;
-        margin-left: -11px;
-    }
-
     .ol-popup-closer {
         text-decoration: none;
         position: absolute;
         top: 2px;
         right: 8px;
+        &:after{
+            content: "✖";
+        }
     }
+    /deep/.project-popup{
+        border-collapse: collapse;
+        width: 98%;
+        background-color: #f5f5f5;
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        /* 表头样式 */
+        th {
+            background-color: #f2f2f2;
+            text-align: center;
+            padding: 10px;
+        }
+        /* 表格内容样式 */
+        td {
+            padding: 10px;
+            text-align: center;
+        }
 
-    .ol-popup-closer:after {
-        content: "✖";
-        // content: "关闭";
+        /* 鼠标悬停样式 */
+        tr:hover {
+            background-color: #f1f1f1;
+        }
     }
     .el-header{
         padding: 0;
@@ -753,5 +777,14 @@
             right: 170px;
             // background-color: #333333;
         }
+        .coor{
+            position: absolute;
+            bottom: 0;
+            left: 20px;
+        }
     }
+
+
+
+
 </style>

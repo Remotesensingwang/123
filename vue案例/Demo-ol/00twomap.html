@@ -78,7 +78,7 @@
             center = map.getView().getCenter();
             size = view.getZoom();
             var s = ol.proj.transform(center, 'EPSG:3857', 'EPSG:4326');
-            var ss = ol.proj.toLonLat(center);
+            var ss = ol.proj.toLonLat(center); 
             map.render();
             // console.log(center,s);
             // console.log(center);
@@ -103,6 +103,8 @@
         // 矢量图层getstyle 
         function getLayers() {
             var layersNumber = map.getLayers().getLength() //2
+            var r=map.getLayers()  //layers集合
+            console.log(r.get('length'));
             var sssss=map.getLayers().length //undifind 不是数组
             var layerkeys =map.getLayers().item(0).getKeys()
             let layerExtent = map.getLayers().item(0).getExtent() //undifind

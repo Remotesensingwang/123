@@ -4,8 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <style>
+        /* 表格样式 */
+        table {
+        border-collapse: collapse;
+        width: 98%;
+        margin: 0 auto;
+        background-color: #f5f5f5;
+        }
+
+        /* 表格边框 */
+        table, th, td {
+        border: 1px solid #ddd;
+        }
+
+        /* 表格标题 */
+        caption {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-bottom: 10px;
+        }
+
+        /* 表头样式 */
+        th {
+            background-color: #f2f2f2;
+            text-align: center;
+            padding: 10px;
+        }
+
+        /* 表格内容样式 */
+        td {
+            padding: 10px;
+            text-align: center;
+        }
+
+        /* 鼠标悬停样式 */
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+    </style>
 </head>
 <body>
+    <table>
+        <thead>
+            <tr>
+                <th>属性</th>
+                <th>内容</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>非遗项目名称</td>
+                <td>'project.name'</td>
+            </tr>
+            <tr>
+                <td>非遗项目地址</td>
+                <td>'project.address'</td>
+            </tr>
+            <tr>
+                <td>非遗项目电话</td>
+                <td>'project.telephone'</td>
+            </tr>
+            <tr>
+                <td>非遗项目地区</td>
+                <td>'project.province + project.city + project.area'</td>
+            </tr>                                                
+        </tbody>
+    </table>
     <script>
 
         const strings = ["1.3", "2", "3", "4", "5"];
