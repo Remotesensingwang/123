@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test</title>
+    <style>
+        .container {
+           position: relative;
+            background-color: skyblue;
+            overflow: hidden;
+            height: 300px;
+            width: 100%;
+        }
+    
+        .left,
+        .right,
+        .main {
+            height: 200px;
+            line-height: 200px;
+            text-align: center;
+        }
+    
+        .left {
+            position: absolute;
+            /* position: absolute;
+            top: 0;
+            left: 0; */
+            width: 100px;
+            background: green;
+            margin-top: 20px;
+        }
+    
+        .right {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            background: green;
+        }
+    
+        .main {
+            margin: 0 110px;
+            background: black;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="left">左边固定宽度</div>
+        <!-- <div class="right">右边固定宽度</div>
+        <div class="main">中间自适应</div> -->
+      </div>
+      <p>这里是内容</p>
+      <script>
+        // 这里是js代码
+        let a =[1,2,3,4,5]
+        console.log(typeof a);
+        console.log(a.join(''));
+        let left = document.querySelector('.left');
+        console.log(left.className);
+       
+      </script>
+</body>
+</html>

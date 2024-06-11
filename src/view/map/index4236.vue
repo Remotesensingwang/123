@@ -106,6 +106,32 @@
                     target: 'map'
                 })
 
+                // // 添加一个绘制使用的layer
+                // this.VectorDraw = new Vector()
+                // this.lineLayer =  new VectorLayer({
+                //     name: 'c1',
+                //     source: this.VectorDraw,
+                //     style: new Style({
+                //         stroke: new Stroke({
+                //             color: 'red',
+                //             size: 1
+                //         }),
+                //         fill: new Fill({
+                //             color: 'magenta'
+                //         }),
+                //         image: new Circle({
+                //             radius: 10,
+                //             fill: null,
+                //             stroke: new Stroke({
+                //                 color: 'magenta'
+                //             })
+                //         })
+                //     })
+                // })
+            
+                // // 绘图的矢量图层添加
+                // this.map.addLayer(this.lineLayer)  
+
                 console.log('initmap',this.map.getLayers());               
                 this.setMarker()
                 this.addOverlay()

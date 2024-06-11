@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- 1、引入 -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.96/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.96/Build/Cesium/Widgets/widgets.css"
+        rel="stylesheet" />
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #cesiumContainer {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #clstr_globe1 {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 200px;
+            height: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 2、准备容器 -->
+    <div id="cesiumContainer"></div>
+    <div id="clstr_globe1">
+        <!-- <script type="text/javascript" id="clstr_globe" src="//clustrmaps.com/globe.js?d=RSUFkX0Gx0XxeiIXKuiWHz89gVoNJM5xHWrSMDpVWYQ"></script> -->
+    </div>
+
+    <!-- <a href="https://clustrmaps.com/site/1bzh5"  title="Visit tracker"><img src="//www.clustrmaps.com/map_v2.png?d=RSUFkX0Gx0XxeiIXKuiWHz89gVoNJM5xHWrSMDpVWYQ&cl=ffffff" /></a> -->
+</body>
+
+<script>
+        var x = document.querySelector('#clstr_globe1'); 
+        console.dir(x);
+        console.log('object');
+        console.log('object');
+        
+        console.log(x.parentNode); 
+        var s = document.createElement('script'); 
+        s.type = 'text/javascript'; 
+        s.id = 'clstr_globe'; 
+        s.src = '//clustrmaps.com/globe.js?d=RSUFkX0Gx0XxeiIXKuiWHz89gVoNJM5xHWrSMDpVWYQ';
+        console.log(s);
+        x.appendChild(s); 
+    // Cesium.Ion.defaultAccessToken =
+    //     // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJmMDY1ZmUxNi1mMGNhLTQ1NDEtYTU2YS0wNTUwZDJhOWNkNmEiLCJpZCI6MTE1MTg3LCJpYXQiOjE3MDA0NDUxNDB9.wdc1z2bc8UV2q_FpcuB5QKtRx8OYLKq4KI3gDs6-gA8";
+    //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlZGUyNzhkYi0yYTUxLTQyNjEtODBlMC01MGM0ODFlNDE3NTIiLCJpZCI6MjEwNjMzLCJpYXQiOjE3MTM4NjI5OTB9.-IbzkC3UQEDG1maM1Gt5sHessqgryvjZGaqa68pXVno";
+
+    // // 3、地图放容器里面
+    // const viewer = new Cesium.Viewer("cesiumContainer");
+</script>
+
+</html>

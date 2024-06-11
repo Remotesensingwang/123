@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ol实例</title>
+    <link rel="stylesheet" href="./ol/ol.css" type="text/css">
+    <script src="./ol/ol-debug.js"></script>
+</head>
+
+<body>
+    <div class="er"></div>
+    <div id="map"></div>
+    <div id="overview-map"></div>
+    <button onclick="removeInteractions()">停止绘图</button>
+    <button onclick="drawGmo('point')">点</button>
+    <button onclick="drawGmo('lineString')">线</button>
+    <button onclick="drawGmo('polygon')">面</button>
+    <button onclick="removeSource()">移除绘图</button>
+    <script>
+
+        var map = new ol.Map({
+            layers: [
+                new ol.layer.Tile({
+                    name: 'osm',
+                    source: new ol.source.OSM()
+                })
+            ],
+            target: 'map',
+            view: new ol.View({
+                center: ol.proj.transform(
+                    [104, 30], 'EPSG:4326', 'EPSG:3857'),
+                zoom: 10
+            })
+        });
+
+        //*******************************添加绘制矢量图层*******************************
+        // 添加一个绘制的线使用的layer
+        let VectorDraw = new ol.source.Vector()
+        let lineLayer = new ol.layer.Vector({
+            name: 'c1',
+            source: VectorDraw,
+            style: new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: 'red',
+                    size: 1
+                }),
+                fill: new ol.style.Fill({
+                    color: 'magenta'
+                }),
+                image: new ol.style.Circle({
+                    radius: 10,
+                    fill: null,
+                    stroke: new ol.style.Stroke({
+                        color: 'magenta'
+                    })
+                })
+            })
+        })
+        let draw = null
+        // 绘图的矢量图层添加
+        map.addLayer(lineLayer)
+        //设置绘图函数
+        function drawGmo(type) {
+            const typeList = { point: 'Point', polygon: 'Polygon', lineString: 'LineString' }
+            if (draw) map.removeInteraction(draw)
+            draw = new ol.interaction.Draw({
+                type: typeList[type],
+                stopClick: true, //点击鼠标不会触发其他的事件
+                source: VectorDraw    // 注意设置source，这样绘制好的线，就会添加到这个source里
+            })
+            if (draw) {
+                map.addInteraction(draw)
+            }
+            
+        }
+        //停止绘图
+        // map.on('dblclick', function () {
+        //     map.removeInteraction(draw)
+        //     console.log(this);
+        // })
+        function removeInteractions() {
+            map.removeInteraction(draw)
+        }
+        //清除绘图
+        function removeSource() {
+            removeInteractions()
+            VectorDraw.clear()
+            lineLayer.setSource(VectorDraw)
+            // VectorDraw=new ol.source.Vector()
+        }
+
+        
+        //*******************************添加普通矢量图层*******************************
+        var layer2 = new ol.layer.Vector({
+            name: 'c2',
+            source: new ol.source.Vector()
+        })
+        map.addLayer(layer2)
+        console.log(layer2.getSource().getFeatures())
+
+        // 添加feature
+        var rect = new ol.Feature({
+            geometry: new ol.geom.Point(ol.proj.fromLonLat([104, 30])),
+            name: 'errrr'
+        })
+
+        layer2.getSource().addFeature(rect);
+        console.log(layer2.getSource().getFeatures())
+        
+
+        // map.addLayer(new ol.layer.Vector({
+        //     source: new ol.source.Vector({
+        //         features: [rect] //必须是数组的形式 不然添加不进去
+        //     }),
+        // }))
+  
+        //矢量数据集是异步加载的 这样子可能读取不到getFeatures（）
+        console.log(map.getLayers().getArray().filter(layer => {
+            return layer.get('name') === 'c2' //features 也类似操作 其中set和直接设置name一样的 都可以get到
+        }))
+
+        //***********************添加鹰眼*****************************************
+        var OverviewMap = new ol.control.OverviewMap({
+            target: document.getElementById('overview-map'),
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM()
+                })],
+        });
+        map.addControl(OverviewMap)
+
+        //***********************通过监视视图的分辨率变化来获取当前视图的缩放等级*******
+        map.getView().on('change:resolution', function () {
+            document.querySelector(".er").innerHTML = parseInt(this.getZoom())
+            // console.log(parseInt(this.getZoom()))
+        })
+
+      //*******************************添加自定义事件*******************************
+      // 为地图注册鼠标移动事件的监听
+      map.on('pointermove', function(event){
+        let hasFeatures=false
+        map.forEachFeatureAtPixel(event.pixel, function(feature){
+            // 为移动到的feature发送自定义的mousemove消息
+            // feature.dispatchEvent({type: 'mousemove', event: event})
+            feature.dispatchEvent('mousemovein')
+        hasFeatures=true
+        })
+        if (!hasFeatures) {
+            rect.dispatchEvent('mousemoveout')
+            console.log('mousemove1');
+        }
+
+      })
+
+      // 为rect注册自定义事件mousemovein的监听
+      rect.on('mousemovein', function(event){
+          // 修改feature的样式为半径100像素的园，用蓝色填充
+          this.setStyle(new ol.style.Style({
+                image: new ol.style.Circle({
+                    radius: 100,
+                    fill: new ol.style.Fill({
+                        color: 'blue'
+                    })
+                })
+            }))
+      })
+
+      rect.on('mousemoveout', function(event){
+          // 修改feature的样式为半径100像素的园，原来的颜色填充
+          this.setStyle(new ol.style.Style({
+                image: new ol.style.Circle({
+                    radius: 100,
+                    fill: new ol.style.Fill({
+                        color: 'red'
+                    })
+                })
+            }))
+      }) 
+        //*******************************interaction实例*******************************
+        // 点击feature改变样式 默认的condition: ol.events.condition.singleClick,
+        // map.addInteraction(new ol.interaction.Select({
+        //     condition: ol.events.condition.singleClick,
+        //     multi: true, //可以选择多个features     
+        //     filter: function(feature, layer){ //矢量筛选
+        //         return layer === circleLayer;
+        //     },
+        //     // 设置选中后的styly
+        //     style: new ol.style.Style({
+        //         image: new ol.style.Circle({
+        //             radius: 10,
+        //             fill: new ol.style.Fill({
+        //                 color: 'blue'
+        //             })
+        //         })
+        //     })
+
+        // }))
+    </script>
+</body>
+
+</html>
