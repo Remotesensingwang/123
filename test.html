@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="http://mockjs.com/dist/mock.js"></script>
     <title>test</title>
     <style>
         .container {
@@ -60,6 +61,60 @@
         console.log(a.join(''));
         let left = document.querySelector('.left');
         console.log(left.className);
+
+        //mock用法
+        // Mock.mock( template )
+        var template = {
+            'title': 'Syntax Demo',
+
+            'string1|1-10': '★',
+            'string2|3': 'value',
+
+            'number1|+1': 100,
+            'number2|1-100': 100,
+            'number3|1-100.1-10': 1,
+            'number4|123.1-10': 1,
+            'number5|123.3': 1,
+            'number6|123.10': 1.123,
+
+            'boolean1|1': true,
+            'boolean2|1-2': true,
+
+            'object1|2-4': {
+                '110000': '北京市',
+                '120000': '天津市',
+                '130000': '河北省',
+                '140000': '山西省'
+            },
+            'object2|2': {
+                '310000': '上海市',
+                '320000': '江苏省',
+                '330000': '浙江省',
+                '340000': '安徽省'
+            },
+
+            'array1|1': ['AMD', 'CMD', 'KMD', 'UMD'],
+            'array2|1-10': ['Mock.js'],
+            'array3|3': ['Mock.js'],
+
+            'function': function() {
+                return this.title
+            }
+        }
+        var data = Mock.mock(template)
+        console.log(data)
+
+        var data2 = Mock.mock({
+                    // Mock.Random.float产生随机数100到8000之间，保留小数 最小0位 最大0位
+                    苹果:Mock.Random.float(100,8000,0,0),
+                    vivo:Mock.Random.float(100,8000,0,0),
+                    oppo:Mock.Random.float(100,8000,0,0),
+                    魅族:Mock.Random.float(100,8000,0,0),
+                    三星:Mock.Random.float(100,8000,0,0),
+                    小米:Mock.Random.float(100,8000,0,0),
+                })
+        console.log(data2)
+        console.dir(data2);
        
       </script>
 </body>

@@ -3,12 +3,14 @@ import request from '@/utils/request'
 
 // 请求首页数据
 // export const getData=()=>{
+//   // console.log(this); //undefined
 //   return request.get('/home/getData')
 // }
 
 
 // 请求首页数据
 export function getData (){
+  // console.log(this); //undefined
   return request({
     url:'/home/getData',
     method:'get',
