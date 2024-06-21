@@ -623,6 +623,7 @@
                 }
                 getPoint().then(
                     response => {
+                        console.log('请求成功了',response);
                         let points = response.data.results
                         let features =[]
                         points.forEach(point => {

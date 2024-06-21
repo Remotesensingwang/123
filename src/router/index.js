@@ -8,6 +8,7 @@ import QiTa from '@/view/layout/QiTa'
 import Cookie from 'js-cookie'
 import Login1 from '@/view/login/login'
 import Map from '@/view/map/index'
+import NotFound  from '@/view/Error/404';
 const router = new VueRouter({
     // mode:'hash',
     // mode:'history',
@@ -75,7 +76,16 @@ const router = new VueRouter({
             name:'map',
             component:Map,
             meta:{title:'地图'}
-        }
+        },
+        {
+            path: '/404',
+            component: NotFound,
+            name: '404',
+            meta: { title: '404' },
+            hidden: true
+          },
+          // 404 page must be placed at the end !!!
+          { path: '*', redirect: '/404'}
 
     ]
 })

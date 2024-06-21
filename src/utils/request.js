@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { Message } from 'element-ui'
+import Cookies from 'js-cookie'
 
 import router from '@/router'
 import store from '@/store'
@@ -16,9 +17,20 @@ const service = axios.create({
   timeout: 10000,
   // withCredentials: true
 })
-
 service.interceptors.request.use(
-  config => {
+  config => {  
+    let token = Cookies.get('token')
+    // 1. 请求开始的时候可以结合 vuex 开启全屏 loading 动画
+    // console.log(store.state.loading)
+    // console.log('准备发送请求...')
+    // 2. 带上token
+    console.log("@@@@config",config);
+    if (token) {
+      config.headers.accessToken = token
+    } else {
+      // 重定向到登录页面
+      router.push('/login')
+    }
     return config
   },
   error => {
